@@ -18,10 +18,14 @@
    6. [Example StatusAlerts](./src/SDK_Examples/Example-StatusAlerts)  
    7. [HelloWorld](./src/SDK_Examples/HelloWorld)  
 
+This library by jcook3701 is being used for the integration of ros and the sFoundation library used for controlling ClearPath motors.  
+
+Below are the instructions for the Trash Bot Motor Controller by jcook3701. It may be broken from the port between ros-melodic to ros-noetic.  
+
 ## Requirements
 The following files are recommended for installation:  
 ```
-$ sudo apt install ros-melodic-teleop-twist-keyboard  
+$ sudo apt-get install ros-noetic-teleop-twist-keyboard  
 ```
 
 ## Setup
