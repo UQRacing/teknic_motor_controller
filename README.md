@@ -20,6 +20,19 @@
 
 This library by jcook3701 is being used for the integration of ros and the sFoundation library used for controlling ClearPath motors.  
 
+### 'Move to' node
+
+The 'move to' node sets up one ClearPath motor, and subscribes to a topic which has the current desired angle. Each loop it moves the motor to the desired angle.
+
+## Building and running
+
+Build using `catkin build`, and then run using
+```
+$ rosrun teknic_motor_controller one_motor_move_to
+```
+
+### jcook3701's Trash Bot Motor Controller
+
 Below are the instructions for the Trash Bot Motor Controller by jcook3701. It may be broken from the port between ros-melodic to ros-noetic.  
 
 ## Requirements
