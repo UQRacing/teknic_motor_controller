@@ -24,12 +24,23 @@ This library by jcook3701 is being used for the integration of ros and the sFoun
 
 The 'move to' node sets up one ClearPath motor, and subscribes to a topic which has the current desired angle. Each loop it moves the motor to the desired angle.
 
-## Building and running
+## XR_usb driver
+Every time you plug in the SC-hub and want to communicate with it over linux, you need to install the XR drivers. I (Tyler) need to add this to the repo. It can be accessed from the link below if you look in ClearPath -> Software -> Linux_software.tar.gz and then follow the READMEs until you find the SC-Hub driver, and run the executable.
+
+https://teknic.com/downloads/
+
+## Building, running and testing
 
 Build using `catkin build`, and then run using
 ```
 $ rosrun teknic_motor_controller one_motor_move_to
 ```
+
+Test using:
+```
+$ rostopic pub -1 /cmd_angle std_msgs/Float64  -- <angle>
+```
+The angle is in pi radians, so if you put in 1 it goes 180 degrees. It uses the absolute angle, so if you put in -2 after you've put in 1 it goes to the position of 1 revolution backwards by spinning 1.5 revolutions backwards.
 
 ### jcook3701's Trash Bot Motor Controller
 
