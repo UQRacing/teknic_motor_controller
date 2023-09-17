@@ -1,29 +1,30 @@
 #include "ros/ros.h"
-#include <std_msgs/Float64.h>
+#include "std_msgs/Float64.h"
 
 #include "pubSysCls.h"
 
 using namespace sFnd;
 
-#define ACC_LIM_RPM_PER_SEC	20
-#define VEL_LIM_RPM			200
-#define TOTAL_CNTS_PER_REV  20000 
+#define ACC_LIM_RPM_PER_SEC	50
+#define VEL_LIM_RPM			50
+#define TOTAL_CNTS_PER_REV  6400
+#define TIME_TILL_TIMEOUT	10000	//The timeout used for homing(ms)
 
 float desired_angle = 0;
 float step_to_go_to =0;
 
-
-
 void cmdAngleCallback(const std_msgs::Float64 &angle) {
+    ROS_INFO("in cmdAngleCallback");                
     desired_angle = angle.data;
+    ROS_INFO("Desired angle %f", desired_angle);
     step_to_go_to = desired_angle * TOTAL_CNTS_PER_REV/2;
 };
 
 
 int main(int argc, char* argv[]){
     ros::init(argc, argv, "one_motor_move_to");
-    ros::NodeHandle nh("~");
-    ros::Subscriber angle_sub = nh.subscribe("cmd_angle", 1, &cmdAngleCallback);
+    ros::NodeHandle nodeHandle("one_motor_move_to");
+    ros::Subscriber angle_sub = nodeHandle.subscribe("cmd_angle", 10, &cmdAngleCallback);
 
     // all the motor stuff was copied from sFoundation's Example-Motion.cpp
     // it builds and spits an error when run without the motor plugged in
@@ -57,6 +58,28 @@ int main(int argc, char* argv[]){
 	motorNode.EnableReq(true);					//Enable node
 
     ROS_INFO("motorNode enabled\n");
+    double timeout = myMgr.TimeStampMsec() + TIME_TILL_TIMEOUT;
+
+    while (!motorNode.Motion.IsReady()) {
+		if (myMgr.TimeStampMsec() > timeout) {
+			ROS_INFO("Error: Timed out waiting for motorNode to enable\n");
+			return -2;
+		}
+	}
+
+    //homing node
+    ROS_INFO("Now homing node");
+    if (!motorNode.Motion.Homing.HomingValid()){
+        ROS_INFO("Homing is not valid");
+        return -3;
+    };
+    motorNode.Motion.Homing.Initiate();
+    myMgr.Delay(15000); // wait for homing
+    if (!motorNode.Motion.Homing.WasHomed()) {
+        ROS_INFO("homing did not finish within 15s");
+        return -4;
+    };
+
 
     motorNode.Motion.MoveWentDone();					//Clear the rising edge Move done register
 
@@ -68,8 +91,14 @@ int main(int argc, char* argv[]){
 																															
 	motorNode.Motion.Adv.TriggerGroup(1);               // Set the trigger group indicator
 
+    motorNode.Motion.Adv.MovePosnStart(0,true);
+    motorNode.Motion.Adv.TriggerMovesInMyGroup();
+
     ROS_INFO("Now looping");
     while (ros::ok()) {
+        //ROS_INFO("step to go to %f", step_to_go_to);
+        
+
         motorNode.Motion.Adv.MovePosnStart(step_to_go_to,true);
         motorNode.Motion.Adv.TriggerMovesInMyGroup();
         ros::spinOnce();
