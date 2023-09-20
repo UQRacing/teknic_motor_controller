@@ -34,6 +34,11 @@ catkin_package(
   CATKIN_DEPENDS roscpp std_msgs # message_runtime std_msgs # sensor_msgs
 )
 
+add_executable(one_motor_move_to
+  src/one_motor_move_to/one_motor_move_to.cpp
+)
+
+
 add_executable(trash_bot_motor_controller
   src/trash_bot_motor_controller/trash_bot_motor_controller.cpp
 )
@@ -103,6 +108,7 @@ add_library(sFoundation
 
 target_link_libraries(sFoundation LibINI LibLinuxOS LibXML ${CMAKE_DL_LIBS})
 
+target_link_libraries(one_motor_move_to sFoundation ${catkin_LIBRARIES})
 target_link_libraries(trash_bot_motor_controller sFoundation ${catkin_LIBRARIES})
 target_link_libraries(Example-GPIO sFoundation ${catkin_LIBRARIES})
 target_link_libraries(Example-Homing sFoundation ${catkin_LIBRARIES})
